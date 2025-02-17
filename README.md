@@ -1,6 +1,7 @@
 # ✨ Full Stack Realtime Chat App ✨
 
 [Demo app](https://chat-app-6bua.onrender.com)
+![Demo App](/frontend/public/screenshot-for-readme.png)
 
 Highlights:
 
