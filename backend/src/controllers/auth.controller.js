@@ -114,3 +114,14 @@ export const checkAuth = (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const updateInChatWithInfo = async (senderId, receiverId) => {
+  try {
+    const updateUser = await User.findByIdAndUpdate(senderId, {
+      $set: { inChatWith: receiverId },
+    });
+  } catch (error) {
+    console.log("Error in updateInChatWithInfo controller: " + error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

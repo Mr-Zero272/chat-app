@@ -97,7 +97,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
         socket.off('newMessage');
     },
-    setSelectedUser: (selectedUser) => {
+    setSelectedUser: async (selectedUser) => {
+        const { selectedUser: previousSelectedUser } = get();
+        if (selectedUser === null || previousSelectedUser === null) {
+            //TODO: send exit chat request.
+            await axiosInstance.post('/api/messages/exit-chat').catch((error) => {
+                console.log('Error in setSelectedUser exit chat', error);
+                if (isAxiosError(error)) {
+                    toast.error((error.response?.data as { message: string }).message);
+                } else {
+                    toast.error('Something went wrong');
+                }
+            });
+        }
         set({ selectedUser });
     },
 }));

@@ -2,6 +2,7 @@ import cloudinary from "../lib/cloudinary.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
+import { updateInChatWithInfo } from "./auth.controller.js";
 
 export const getUsersForSidebar = async (req, res) => {
   try {
@@ -28,9 +29,22 @@ export const getMessages = async (req, res) => {
       ],
     });
 
+    await updateInChatWithInfo(myId, userToChatId);
+
     res.status(200).json(messages);
   } catch (error) {
     console.log("Error in getMessages: ", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const exitChat = async (req, res) => {
+  try {
+    const myId = req.user._id;
+    await updateInChatWithInfo(myId, null);
+    res.status(200).json({ message: "Chat exited successfully" });
+  } catch (error) {
+    console.log("Error in exitChat: ", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
