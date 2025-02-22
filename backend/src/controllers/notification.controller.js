@@ -1,31 +1,56 @@
-import Notification from "../models/notification.model";
-import User from "../models/user.model";
+import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 
-export const pushNotification = async (req, res) => {
+export const createNotification = async (
+  senderId,
+  receiverId,
+  type,
+  title,
+  content,
+  messageId
+) => {
   try {
-    const { receiverId, type, content, messageId } = req.body;
-    const myId = req.user_id;
-
     const receiveUser = await User.findById(receiverId);
-    if (receiveUser.inChatWith !== null && receiveUser.inChatWith === myId) {
+    if (!receiveUser) return null;
+
+    if (!receiveUser.inChatWith || receiveUser.inChatWith === null) {
       const newNotification = new Notification({
-        senderId: myId,
+        senderId,
         receiverId,
         type,
+        title,
         content,
         messageId,
         relatedEntityType: "Message",
         status: "unread",
       });
-      await newNotification.save();
-
-      // const receiverSocketId = getReceiverSocketId(receiverId);
-      // if (receiverSocketId) {
-      //   io.to(receiverSocketId).emit("newNotification", newNotification);
-      // }
+      const savedNotification = await newNotification.save();
+      return savedNotification;
     }
+    return null;
+  } catch (error) {
+    console.log("Error in createNotification: " + error);
+    return null;
+  }
+};
 
-    res.status(201).json({ message: "Notification sent successfully" });
+export const pushNotification = async (req, res) => {
+  try {
+    const { receiverId, type, title, content, messageId } = req.body;
+    const myId = req.user._id;
+    const isNewNotificationCreated = await createNotification(
+      myId,
+      receiverId,
+      type,
+      title,
+      content,
+      messageId
+    );
+    if (isNewNotificationCreated) {
+      res.status(201).json({ message: "Notification sent successfully" });
+    } else {
+      res.status(201).json({ message: "You are in the chat screen" });
+    }
   } catch (error) {
     console.log("Error in pushNotification controller: " + error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -35,7 +60,7 @@ export const pushNotification = async (req, res) => {
 export const getNotifications = async (req, res) => {
   try {
     const { status } = req.params;
-    const notifications = [];
+    let notifications = [];
     if (status) {
       notifications = await Notification.find({
         receiverId: req.user._id,

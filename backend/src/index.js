@@ -4,6 +4,7 @@ import cookiesParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import notificationRoutes from "./routes/notification.route.js";
 import { connectToDB } from "./lib/db.js";
 import cors from "cors";
 import { app, server } from "./lib/socket.js";
@@ -26,6 +27,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

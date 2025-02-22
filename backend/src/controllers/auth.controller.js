@@ -117,7 +117,7 @@ export const checkAuth = (req, res) => {
 
 export const updateInChatWithInfo = async (senderId, receiverId) => {
   try {
-    const updateUser = await User.findByIdAndUpdate(senderId, {
+    await User.findByIdAndUpdate(senderId, {
       $set: { inChatWith: receiverId },
     });
   } catch (error) {

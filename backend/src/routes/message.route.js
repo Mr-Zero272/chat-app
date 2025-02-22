@@ -14,6 +14,6 @@ router.get("/:id", protectRoute, getMessages);
 
 router.post("/send/:id", protectRoute, sendMessage);
 
-router.post("/chat-with", protectRoute, exitChat);
+router.post("/exit-chat", protectRoute, exitChat);
 
 export default router;
